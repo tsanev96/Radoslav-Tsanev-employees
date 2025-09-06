@@ -1,4 +1,4 @@
-import { TABLE_HEADERS } from "../../constants/tableHeaders";
+import { TABLE_HEADERS_OUTPUT } from "../../constants/tableHeaders";
 import type { Employee } from "../../types/employee";
 import styles from "./DataTable.module.css";
 
@@ -13,7 +13,7 @@ export default function DataTable({ data }: Props) {
       <h2 className="headline">Some content for table</h2>
       <div className="table">
         <div className={styles.tableHeader}>
-          {TABLE_HEADERS.map((header) => (
+          {TABLE_HEADERS_OUTPUT.map((header) => (
             <p>{header}</p>
           ))}
         </div>

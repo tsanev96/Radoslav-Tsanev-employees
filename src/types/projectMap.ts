@@ -1,4 +1,4 @@
-interface WorkPeriod {
+export interface WorkPeriod {
   employeeID: number;
   dateFrom: Date;
   dateTo: Date;

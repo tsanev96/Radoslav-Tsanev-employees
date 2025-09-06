@@ -1,22 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
-import DataTable from "./components/DataTable/DataTable";
-import { TableHeaders } from "./types/tableHeaders";
-import type { ProjectMap } from "./types/projectMap";
-import { parseCSVfile } from "./utils/csvParser";
-import { createProjectMap } from "./utils/employeePairs";
+import { computePairs, type PairsResult } from "./utils/employeePairs";
 
 function App() {
-  const [data, setData] = useState<ProjectMap | null>(null);
+  const [data, setData] = useState<PairsResult[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const headers: TableHeaders[] = [
-    TableHeaders.EmpID,
-    TableHeaders.ProjectID,
-    TableHeaders.DateFrom,
-    TableHeaders.DateTo,
-  ];
-
+  useEffect(() => {
+    console.log("final output: ", data);
+  }, [data]);
   const handleUploadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -25,10 +17,8 @@ function App() {
     reader.readAsText(file);
     reader.onload = () => {
       try {
-        console.log(reader.result);
-        const parsedData = parseCSVfile(reader.result as string, headers);
-        setData(createProjectMap(parsedData));
-        setError(null);
+        const pairsData = computePairs(reader.result as string);
+        setData(pairsData);
       } catch (error) {
         const errorMessage =
           error instanceof Error
