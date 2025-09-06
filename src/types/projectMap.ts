@@ -4,4 +4,6 @@ export interface WorkPeriod {
   dateTo: Date;
 }
 
-export type ProjectMap = Map<number, WorkPeriod[]>;
+type ProjectID = number;
+
+export type ProjectMap = Map<ProjectID, WorkPeriod[]>;
