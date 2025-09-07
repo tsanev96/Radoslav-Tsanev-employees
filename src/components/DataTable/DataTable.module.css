@@ -1,4 +1,136 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.table {
+  margin-bottom: 20px;
+}
+
+.table span {
+  display: block;
+  padding: 15px 10px;
+  text-align: left;
+  color: var(--color-white);
+}
+
 .tableHeader {
-    display: flex;
-    background: orange
+  display: flex;
+  background: var(--color-gradient);
+  & > * {
+    flex: 1;
+  }
+}
+
+.tableHeader span {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.tableRow {
+  display: flex;
+  background: var(--color-primary);
+  cursor: pointer;
+  transition-duration: 0.3s;
+  border-bottom: 1px solid var(--color-white);
+  & > * {
+    flex: 1;
+  }
+}
+
+.tableRow span {
+  font-size: 18px;
+  font-weight: bold;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tableRow:nth-child(even) {
+  background: var(--color-primary-light);
+}
+
+.tableRow:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.headline {
+  margin-bottom: 20px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.arrow {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  background: white;
+  position: relative;
+  cursor: pointer;
+}
+
+.arrow:hover {
+  transform: scale(1.1);
+}
+
+.arrow::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-top: 2.5px solid currentColor;
+  border-right: 2.5px solid currentColor;
+  transform: translate(-60%, -50%) rotate(45deg);
+  color: var(--color-primary);
+}
+
+.arrow.prev::before {
+  transform: translate(-40%, -50%) rotate(-135deg);
+}
+
+.arrow.disabled {
+  opacity: 0.2;
+  transform: scale(1);
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .tableHeader span {
+    padding: 10px 5px;
+    font-size: 16px;
+  }
+
+  .tableRow {
+    flex-direction: column;
+    margin-bottom: 5px;
+  }
+
+  .tableRow span {
+    font-size: 18px;
+    /* display: flex;
+    justify-content: space-between; */
+  }
+
+  .tableRow span::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: var(--color-white);
+  }
+
+  .tableHeader {
+    display: none;
+  }
 }

@@ -3,7 +3,11 @@ import { TableHeaders } from "../types/tableHeaders";
 import { parseDate, parseNumber } from "./parserData";
 
 export function parseCSVfile(text: string, headers: TableHeaders[]) {
-  const rows = text.split("\n").map((line) => line.trim());
+  const rows = text
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => line.trim());
+
   const data: Employee[] = rows.slice(1).map((row) => {
     const values = row.split(",").map((v) => v.trim());
 

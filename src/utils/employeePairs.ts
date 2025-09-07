@@ -7,6 +7,7 @@ import type {
 } from "../types/employee";
 import type { ProjectMap, WorkPeriod } from "../types/projectMap";
 import { parseCSVfile } from "./csvParser";
+import { sortPairs } from "./sort";
 
 function createProjectMap(csvData: Employee[]): ProjectMap {
   const map: ProjectMap = new Map();
@@ -37,15 +38,19 @@ function getOverlapDays({ emp1, emp2 }: OverlapArgs): number {
     : 0;
 }
 
-function createEmployeePairKey(
-  employeeId1: number,
-  employeeId2: number,
+function makeEmployeePairKey(
+  emp1: number,
+  emp2: number,
   projectId: number,
-) {
-  return `${Math.min(employeeId1, employeeId2)}_${Math.max(
-    employeeId1,
-    employeeId2,
-  )}_${projectId}`;
+): { key: string; id1: number; id2: number } {
+  const id1 = Math.min(emp1, emp2);
+  const id2 = Math.max(emp1, emp2);
+
+  return {
+    key: `${id1}_${id2}_${projectId}`,
+    id1,
+    id2,
+  };
 }
 
 function convertPairMapToArray(pairsMap: EmployeePairProject): PairsResult[] {
@@ -62,26 +67,27 @@ function getPairsForProject(csvData: Employee[]): EmployeePairProject {
       for (let j = i + 1; j < employees.length; j++) {
         const emp1 = employees[i];
         const emp2 = employees[j];
-        const keyPair = createEmployeePairKey(
+
+        const overlapDays = getOverlapDays({ emp1, emp2 });
+
+        if (overlapDays <= 0 || emp1.employeeID === emp2.employeeID) {
+          continue;
+        }
+
+        const { key, id1, id2 } = makeEmployeePairKey(
           emp1.employeeID,
           emp2.employeeID,
           projectID,
         );
 
-        const overlapDays = getOverlapDays({ emp1, emp2 });
-
-        if (overlapDays <= 0) {
-          continue;
-        }
-
-        const existingPair = results.get(keyPair);
+        const existingPair = results.get(key);
 
         if (existingPair) {
           existingPair.daysWorked += overlapDays;
         } else {
-          results.set(keyPair, {
-            employeeID1: emp1.employeeID,
-            employeeID2: emp2.employeeID,
+          results.set(key, {
+            employeeID1: id1,
+            employeeID2: id2,
             projectID: projectID,
             daysWorked: overlapDays,
           });
@@ -90,16 +96,12 @@ function getPairsForProject(csvData: Employee[]): EmployeePairProject {
     }
   }
 
-  console.log("results ", results);
-  results.forEach((value, key) => {
-    console.log("value ", value);
-  });
-
   return results;
 }
 
-export function computePairs(csv: string) {
+export function computePairs(csv: string): PairsResult[] {
   const parsed = parseCSVfile(csv, TABLE_HEADERS_INPUT);
   const pairsForProject = getPairsForProject(parsed);
-  return convertPairMapToArray(pairsForProject);
+  const pairsArray = convertPairMapToArray(pairsForProject);
+  return sortPairs(pairsArray, "daysWorked", "desc");
 }

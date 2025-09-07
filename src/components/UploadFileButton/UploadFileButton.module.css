@@ -1,0 +1,27 @@
+.container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.uploadBtn {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  background: var(--color-gradient);
+  font-size: 16px;
+  border-radius: 6px;
+  color: var(--color-white);
+  cursor: pointer;
+}
+
+.fileName {
+  display: inline-block;
+}
+
+.arrows {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
