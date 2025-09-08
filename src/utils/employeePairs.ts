@@ -7,7 +7,6 @@ import type {
 } from "../types/employee";
 import type { ProjectMap, WorkPeriod } from "../types/projectMap";
 import { parseCSVfile } from "./csvParser";
-import { sortPairs } from "./sort";
 
 function createProjectMap(csvData: Employee[]): ProjectMap {
   const map: ProjectMap = new Map();
@@ -103,5 +102,5 @@ export function computePairs(csv: string): PairsResult[] {
   const parsed = parseCSVfile(csv, TABLE_HEADERS_INPUT);
   const pairsForProject = getPairsForProject(parsed);
   const pairsArray = convertPairMapToArray(pairsForProject);
-  return sortPairs(pairsArray, "daysWorked", "desc");
+  return pairsArray;
 }

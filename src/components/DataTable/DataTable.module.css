@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 500px;
+  min-height: 640px;
   margin: 0 auto;
   width: 100%;
 }
@@ -33,7 +33,7 @@
 
 .tableRow {
   display: flex;
-  background: var(--color-primary);
+  background: var(--color-primary-light);
   cursor: pointer;
   transition-duration: 0.3s;
   border-bottom: 1px solid var(--color-white);
@@ -51,6 +51,10 @@
 }
 
 .tableRow:nth-child(even) {
+  background: var(--color-primary);
+}
+
+.tableRow.even {
   background: var(--color-primary-light);
 }
 
@@ -68,6 +72,12 @@
   justify-content: center;
   align-items: center;
   gap: 20px;
+}
+
+.sortIcon {
+  display: inline-block !important;
+  margin-left: 5px;
+  padding: 0 !important;
 }
 
 .arrow {
@@ -120,8 +130,6 @@
 
   .tableRow span {
     font-size: 18px;
-    /* display: flex;
-    justify-content: space-between; */
   }
 
   .tableRow span::before {

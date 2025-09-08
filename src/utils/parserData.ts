@@ -12,12 +12,24 @@ export function parseNumber(value: string, headerValue: keyof Employee) {
 
 export function parseDate(value: string, headerValue: keyof Employee) {
   const isStillWorking =
-    value.toLowerCase() === "null" && headerValue === "dateTo";
-  const date = isStillWorking ? new Date() : new Date(value);
+    typeof value === "string" &&
+    value.toLowerCase() === "null" &&
+    headerValue === "dateTo";
+
+  if (isStillWorking) {
+    return new Date();
+  }
+
+  const date =
+    isNaN(Number(value)) || value.trim() === ""
+      ? new Date(value)
+      : new Date(Number(value));
+
   if (isNaN(date.getTime())) {
     throw new Error(
       `Invalid value for ${headerValue}: ${value}, must be a correct date format`,
     );
   }
+
   return date;
 }

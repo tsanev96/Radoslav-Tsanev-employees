@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TABLE_HEADERS_OUTPUT } from "../../constants/tableHeaders";
 import type { PairsResult } from "../../types/employee";
 import styles from "./DataTable.module.css";
 import classNames from "classnames";
 import { paginate } from "../../utils/paginate";
+import { sortPairs } from "../../utils/sort";
+import { scrollToTop } from "../../utils/scroll";
 
 interface Props {
   data: PairsResult[];
@@ -11,35 +13,74 @@ interface Props {
 
 export default function DataTable({ data }: Props) {
   const [page, setPage] = useState(1);
+  const [sortKey, setSortKey] = useState<keyof PairsResult>("daysWorked");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  const pageSize = 3;
+  const pageSize = 10;
 
-  const pagedData = paginate({ items: data, page, pageSize });
+  const sortedData = sortPairs(data, sortKey, sortDir);
+  const pagedData = paginate({ items: sortedData, page, pageSize });
 
   const isMultiPage = data.length > pageSize;
+
+  useEffect(() => {
+    setPage(1);
+  }, [sortKey, sortDir]);
+
+  function handleSort(key: keyof PairsResult) {
+    if (sortKey === key) {
+      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  }
+
+  function handleNext() {
+    setPage((p) => (p * pageSize < data.length ? p + 1 : p));
+    scrollToTop();
+  }
+
+  function handlePrev() {
+    setPage((p) => Math.max(1, p - 1));
+    scrollToTop();
+  }
 
   return (
     <div className={styles.container}>
       <section className={styles.table}>
         <div className={styles.tableHeader}>
-          {TABLE_HEADERS_OUTPUT.map((header) => (
-            <span>{header}</span>
-          ))}
+          {TABLE_HEADERS_OUTPUT.map(({ title, key, sortable }) => {
+            const isSortableKey = sortable && key === sortKey;
+
+            return (
+              <span
+                key={title}
+                onClick={sortable && key ? () => handleSort(key) : undefined}
+              >
+                {title}
+                {sortable && key && (
+                  <span className={styles.sortIcon}>
+                    {isSortableKey ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}
+                  </span>
+                )}
+              </span>
+            );
+          })}
         </div>
         <div className={styles.tableBody}>
-          {pagedData.map(
-            ({ employeeID1, employeeID2, projectID, daysWorked }) => (
-              <div
-                className={styles.tableRow}
-                key={`${employeeID1}_${employeeID2}_${projectID}`}
-              >
-                <span data-label={TABLE_HEADERS_OUTPUT[0]}>{employeeID1}</span>
-                <span data-label={TABLE_HEADERS_OUTPUT[1]}>{employeeID2}</span>
-                <span data-label={TABLE_HEADERS_OUTPUT[2]}>{projectID}</span>
-                <span data-label={TABLE_HEADERS_OUTPUT[3]}>{daysWorked}</span>
-              </div>
-            ),
-          )}
+          {pagedData.map((el, index) => (
+            <div
+              className={styles.tableRow}
+              key={`${el.employeeID1}_${el.employeeID2}_${el.projectID}_${index}`}
+            >
+              {TABLE_HEADERS_OUTPUT.map(({ title, key }) => (
+                <span key={key} data-label={title}>
+                  {el[key]}
+                </span>
+              ))}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -49,7 +90,7 @@ export default function DataTable({ data }: Props) {
             className={classNames(styles.arrow, styles.prev, {
               [styles.disabled]: page === 1,
             })}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={handlePrev}
           />
         )}
         <span>Page {page}</span>
@@ -58,9 +99,7 @@ export default function DataTable({ data }: Props) {
             className={classNames(styles.arrow, {
               [styles.disabled]: page * pageSize >= data.length,
             })}
-            onClick={() =>
-              setPage((p) => (p * pageSize < data.length ? p + 1 : p))
-            }
+            onClick={handleNext}
           />
         )}
       </div>
